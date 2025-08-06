@@ -1,4 +1,3 @@
-// server.js
 const express = require('express'); 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -78,14 +77,6 @@ io.on("connection", socket => {
     socket.to(room).emit("finished", { time });
   });
 
-  // kullanıcının "Evet, oyundan çıkmak istiyorum" dediği durum
-  socket.on("leave_game", ({ room }) => {
-    console.log("leave_game from", socket.id, "in", room);
-    socket.to(room).emit("opponent_disconnected");
-    if (rooms[room]) delete rooms[room];
-    socket.leave(room);
-  });
-
   socket.on("disconnect", () => {
     console.log("Ayrılan:", socket.id);
     if (waitingPlayer === socket) waitingPlayer = null;
@@ -100,5 +91,5 @@ io.on("connection", socket => {
 
 const port = process.env.PORT || 8080;
 server.listen(port, "0.0.0.0", () => {
-  console.log(`Socket.IO sunucusu ${port} portunda çalışıyor`);
-});
+  console.log(Socket.IO sunucusu ${port} portunda çalışıyor);
+}); 
