@@ -1,3 +1,4 @@
+// server.js
 const express = require('express'); 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -77,9 +78,21 @@ io.on("connection", socket => {
     socket.to(room).emit("finished", { time });
   });
 
+  // --- Yeni: Oyuncu gönüllü ayrıldığında (forfeit)
+  socket.on("player_left", ({ room }) => {
+    console.log("player_left from", socket.id, "room:", room);
+    if (room) {
+      socket.to(room).emit("opponent_left");
+      // Odayı temizlemeyi tercih edebiliriz (tek eşleşme mantığı olduğundan):
+      delete rooms[room];
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("Ayrılan:", socket.id);
     if (waitingPlayer === socket) waitingPlayer = null;
+
+    // Üye olduğu odalara rakibin ayrıldığını bildir
     Array.from(socket.rooms)
       .filter(r => r !== socket.id)
       .forEach(room => {
@@ -89,8 +102,7 @@ io.on("connection", socket => {
   });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 server.listen(port, "0.0.0.0", () => {
   console.log(`Socket.IO sunucusu ${port} portunda çalışıyor`);
-
-}); 
+});
